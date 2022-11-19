@@ -17,18 +17,18 @@ export default function EventList(props) {
   // console.log('item====>', item);
 
   const renderStatus = () => {
-    var dateFrom = moment(item.startDate).format('L');
-    var dateTo = moment(item.endDate).format('L');
-    var dateCheck = moment(new Date()).format('L');
-
-    var d1 = dateFrom.split('/');
-    var d2 = dateTo.split('/');
-    var c = dateCheck.split('/');
-
-    var from = new Date(d1[2], parseInt(d1[1]) - 1, d1[0]); // -1 because months are from 0 to 11
-    var to = new Date(d2[2], parseInt(d2[1]) - 1, d2[0]);
-    var check = new Date(c[2], parseInt(c[1]) - 1, c[0]);
-    console.log(check > from && check < to);
+    var dateFrom =
+      moment(item.startDate).format('L') +
+      ' ' +
+      moment(item.startTime).format('LTS');
+    var dateTo =
+      moment(item.endDate).format('L') +
+      ' ' +
+      moment(item.endTime).format('LTS');
+    var dateCheck = moment().format('L') + ' ' + moment().format('LTS');
+    console.log('dateFrom', dateFrom);
+    console.log('dateTo', dateTo);
+    console.log('dateCheck', dateCheck);
     if (dateCheck >= dateFrom && dateCheck <= dateTo) {
       return (
         <View

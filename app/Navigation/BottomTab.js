@@ -67,7 +67,7 @@ export default function BottomTab() {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="diamond"
         component={CommingSoon}
         options={{
@@ -79,7 +79,7 @@ export default function BottomTab() {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="MyTickets"
         component={MyTickets}

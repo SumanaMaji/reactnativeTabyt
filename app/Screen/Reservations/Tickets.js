@@ -134,9 +134,20 @@ const Tickets = props => {
       }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {ticketsList.map((item, key) => {
-          var dateFrom = moment(item.startDate).format('L');
-          var dateTo = moment(item.endDate).format('L');
-          var dateCheck = moment(new Date()).format('L');
+          // var dateFrom = moment(item.startDate).format('L');
+          // var dateTo = moment(item.endDate).format('L');
+          // var dateCheck = moment(new Date()).format('L');
+
+          var dateFrom =
+            moment(item.startDate).format('L') +
+            ' ' +
+            moment(item.startTime).format('LTS');
+          var dateTo =
+            moment(item.endDate).format('L') +
+            ' ' +
+            moment(item.endTime).format('LTS');
+          var dateCheck = moment().format('L') + ' ' + moment().format('LTS');
+
           if (!item.isAvailable) {
             item.msg = 'Sold out!';
           }
