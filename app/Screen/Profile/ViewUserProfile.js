@@ -18,6 +18,7 @@ import TicketsList from '../../Component/Tickets/TicketsList';
 import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale} from '../../PixelRatio';
+import Auth from '../../Service/Auth';
 import Event from '../../Service/Event';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
@@ -31,6 +32,10 @@ const ViewUserProfile = props => {
   const [userEvent, setuserEvent] = useState([]);
   const [active, setactive] = useState(0);
   const [age, setage] = useState(0);
+  const [cityName, setcityName] = useState('');
+  const [stateName, setstateName] = useState('');
+  const [followStatus, setfollowStatus] = useState('Follow');
+  const [followButton, setfollowButton] = useState(true);
 
   useEffect(() => {
     getUserData();
@@ -39,12 +44,57 @@ const ViewUserProfile = props => {
   const getUserData = async () => {
     console.log('getUserProfile=>>', uname, uId);
     const result = await Event.getUserProfile(uId);
-    console.log('userProfile', result);
+    console.log('userProfile', JSON.stringify(result));
     if (result && result.status) {
       setuData(result?.data);
       setuserEvent(result?.data?.bookingEvents);
-      setisFetching(false);
+      getAllStates(result?.data?.state);
+      getCity(result?.data?.state, result?.data?.city);
       getAge(result?.data);
+      setisFetching(false);
+      if (result?.data?.followers) {
+        const checkFollowStatus = result?.data?.followers.filter(
+          i => i.receiver == userData._id || i.sender == userData._id,
+        );
+        console.log('checkFollowStatus=>>', checkFollowStatus);
+        if (checkFollowStatus.length > 0) {
+          const followCheck = checkFollowStatus.filter(i => i.accpect == true);
+          if (followCheck && followCheck.length > 0) {
+            setfollowStatus('Following');
+          } else {
+            setfollowStatus('Following Requested');
+            setfollowButton(true);
+          }
+        } else {
+          setfollowButton(false);
+        }
+      } else {
+        setfollowButton(false);
+      }
+    }
+  };
+
+  const getAllStates = async stateId => {
+    let result = await Auth.getStates();
+    // console.log('states', result);
+    if (result && result.success) {
+      // setallstates(result.data);
+      const currentState = result.data.filter(i => i.id === stateId);
+      if (currentState.length > 0) {
+        setstateName(currentState[0].name);
+      }
+    }
+  };
+
+  const getCity = async (stateId, cityId) => {
+    let result = await Auth.getCity(stateId);
+    // console.log('city result', result);
+    if (result && result.success) {
+      // setallcity(result.data);
+      const currentCity = result.data.filter(i => i.id === cityId);
+      if (currentCity.length > 0) {
+        setcityName(currentCity[0].name);
+      }
     }
   };
 
@@ -52,7 +102,7 @@ const ViewUserProfile = props => {
     // setTimeout(() => {
     let a = moment([moment().format('YYYY', 'MM')]);
     let b = moment([moment(dada.dob, 'MM/DD/YYYY').format('YYYY', 'MM')]);
-    console.log('getAge', b);
+    // console.log('getAge', b);
     const agee = a.diff(b, 'years');
     setage(agee);
     // }, 1000);
@@ -63,6 +113,8 @@ const ViewUserProfile = props => {
     console.log('followUser=>>>', result);
     if (result && result.status) {
       SimpleToast.show('Follow requested successfully!');
+      setfollowStatus('Following Requested');
+      setfollowButton(true);
     }
   };
 
@@ -120,7 +172,7 @@ const ViewUserProfile = props => {
                   <View
                     style={{alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={{color: COLORS.white, fontFamily: FONTS.Bold}}>
-                      {uData?.followers?.length}
+                      {uData?.followers.filter(i => i.accpect == true).length}
                     </Text>
                     <Text
                       style={{
@@ -281,7 +333,7 @@ const ViewUserProfile = props => {
                 }}>
                 {uData?.firstname} {uData?.lastname}
               </Text>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 // onPress={followUser}
                 style={{
                   backgroundColor: COLORS.theme,
@@ -294,7 +346,7 @@ const ViewUserProfile = props => {
                 <Text style={{color: COLORS.white, fontFamily: FONTS.Bold}}>
                   ADD
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <Text
               style={{
@@ -310,56 +362,107 @@ const ViewUserProfile = props => {
                   : iii.name + ', ';
               })}
             </Text>
-            <View
+            <Text
               style={{
-                flexDirection: 'row',
-                // justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: 7,
+                color: COLORS.white,
+                fontFamily: FONTS.Medium,
+                opacity: 0.7,
               }}>
-              <TouchableOpacity
-                onPress={() =>
-                  Navigation.navigate('SingleChat', {
-                    name: uData?.firstname + ' ' + uData?.lastname,
-                    img: uData?.image,
-                    uId: uData?._id,
-                  })
-                }
+              {cityName} | {stateName} | {uData?.relationship} |{' '}
+              {uData?.profession}
+            </Text>
+            <Text
+              style={{
+                color: COLORS.white,
+                fontFamily: FONTS.Medium,
+                opacity: 0.7,
+              }}>
+              {uData?.bio}
+            </Text>
+            {/* follow view */}
+            {uId == userData._id ? null : (
+              <View
                 style={{
-                  paddingHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: COLORS.cream,
-                  paddingVertical: 0,
-                  borderRadius: 5,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: 7,
+                  width: '100%',
                 }}>
-                <Text
+                <TouchableOpacity
+                  disabled={followButton}
+                  onPress={followUser}
                   style={{
-                    color: COLORS.cream,
-                    fontFamily: FONTS.Medium,
-                    fontSize: 13,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: COLORS.cream,
+                    paddingVertical: 0,
+                    borderRadius: 5,
+                    // marginLeft: 10,
+                    width: '30%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
-                  MESSAGE
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  paddingHorizontal: 10,
-                  borderWidth: 1,
-                  borderColor: COLORS.cream,
-                  paddingVertical: 0,
-                  borderRadius: 5,
-                  marginLeft: 10,
-                }}>
-                <Text
+                  <Text
+                    numberOfLines={1}
+                    style={{
+                      color: COLORS.cream,
+                      fontFamily: FONTS.Medium,
+                      fontSize: 13,
+                    }}>
+                    {followStatus}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    Navigation.navigate('SingleChat', {
+                      name: uData?.firstname + ' ' + uData?.lastname,
+                      img: uData?.image,
+                      uId: uData?._id,
+                    })
+                  }
                   style={{
-                    color: COLORS.cream,
-                    fontFamily: FONTS.Medium,
-                    fontSize: 13,
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: COLORS.cream,
+                    paddingVertical: 0,
+                    borderRadius: 5,
+                    width: '30%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
-                  GIFT
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text
+                    style={{
+                      color: COLORS.cream,
+                      fontFamily: FONTS.Medium,
+                      fontSize: 13,
+                    }}>
+                    MESSAGE
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    paddingHorizontal: 10,
+                    borderWidth: 1,
+                    borderColor: COLORS.cream,
+                    paddingVertical: 0,
+                    borderRadius: 5,
+                    // marginLeft: 10,
+                    width: '33%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: COLORS.cream,
+                      fontFamily: FONTS.Medium,
+                      fontSize: 13,
+                    }}>
+                    SEND GIFT
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
 
           <View style={{flex: 1, alignItems: 'center'}}>
@@ -380,7 +483,7 @@ const ViewUserProfile = props => {
                   EVENTS
                 </Text>
               </Pressable>
-              <Pressable
+              {/* <Pressable
                 onPress={() => setactive(1)}
                 style={[
                   styles.titleView,
@@ -389,7 +492,7 @@ const ViewUserProfile = props => {
                 <Text numberOfLines={1} style={styles.title}>
                   PHOTOS
                 </Text>
-              </Pressable>
+              </Pressable> */}
             </View>
 
             {active == 0 ? (

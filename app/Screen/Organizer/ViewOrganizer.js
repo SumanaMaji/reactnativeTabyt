@@ -13,24 +13,33 @@ import Loader from '../../Component/Loader';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import OrganizerEvents from './OrganizerEvents';
 import OrganizerReview from './OrganizerReview';
+import {useSelector} from 'react-redux';
+import SimpleToast from 'react-native-simple-toast';
 
 const ViewOrganizer = props => {
   const {oId} = props.route.params;
+  const {userData} = useSelector(state => state.User);
   const [activeTab, setactiveTab] = useState(1);
   const [organizerData, setorganizerData] = useState({});
   const [isFetching, setisFetching] = useState(true);
   const [avgReview, setavgReview] = useState(0);
   const [reviewLength, setreviewLength] = useState(0);
+  const [follower, setfollower] = useState(0);
+  const [followStatus, setfollowStatus] = useState('Follow');
+  const [followButton, setfollowButton] = useState(true);
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    const result = await Auth.viewOrganizerProfile(oId);
+    const result = await Auth.viewOrganizerProfile(
+      oId + '?user=' + userData._id,
+    );
     console.log('result =0 css', JSON.stringify(result));
     if (result && result.status) {
       setorganizerData(result.data);
+      setfollower(result.data?.follower.filter(i => i.accpect == true).length);
       setreviewLength(result?.data?.eventreviews?.length);
       const totalReview = result?.data?.eventreviews?.reduce(
         (accumulator, object) => {
@@ -43,8 +52,39 @@ const ViewOrganizer = props => {
           Number(totalReview / result?.data?.eventreviews?.length).toFixed(1),
         );
       }
+      if (result?.data?.follower) {
+        const checkFollowStatus = result?.data?.follower.filter(
+          i => i.receiver == userData._id || i.sender == userData._id,
+        );
+        console.log('checkFollowStatus=>>', checkFollowStatus);
+        if (checkFollowStatus.length > 0) {
+          const followCheck = checkFollowStatus.filter(i => i.accpect == true);
+          if (followCheck && followCheck.length > 0) {
+            setfollowStatus('Following');
+          } else {
+            setfollowStatus('Following Requested');
+            setfollowButton(true);
+          }
+        } else {
+          setfollowButton(false);
+        }
+      } else {
+        setfollowButton(false);
+      }
     }
     setisFetching(false);
+  };
+
+  const handleFollow = async () => {
+    const result = await Auth.followOrganizer({
+      receiver: organizerData._id,
+    });
+    console.log('handleFollow=>>', result);
+    if (result && result.status) {
+      SimpleToast.show('Follow requested successfully!');
+      setfollowStatus('Following Requested');
+      setfollowButton(true);
+    }
   };
 
   return (
@@ -77,7 +117,7 @@ const ViewOrganizer = props => {
             </View>
             <View style={{justifyContent: 'center', alignItems: 'center'}}>
               <Text style={{color: COLORS.white, fontFamily: FONTS.Medium}}>
-                4
+                {follower}
               </Text>
               <Text style={{color: COLORS.white, fontFamily: FONTS.Medium}}>
                 Followers
@@ -128,11 +168,28 @@ const ViewOrganizer = props => {
                 </Text>
               </View>
             </View>
-            <NormalButton
-              title="Follow"
-              style={{width: 80, height: 40}}
+            {/* <NormalButton
+              disabled={followButton}
+              onPress={handleFollow}
+              title={followStatus}
+              style={{maxWidth: '70%', height: 40, paddingHorizontal: 10}}
               titleStyle={{fontFamily: FONTS.Medium}}
-            />
+            /> */}
+            <TouchableOpacity
+              onPress={handleFollow}
+              disabled={followButton}
+              style={{
+                backgroundColor: COLORS.theme,
+                height: 40,
+                borderRadius: 5,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 10,
+              }}>
+              <Text style={{fontFamily: FONTS.Medium, color: COLORS.white}}>
+                {followStatus}
+              </Text>
+            </TouchableOpacity>
           </View>
           <Text style={{marginHorizontal: 30, color: COLORS.white}}>
             {organizerData?.organizerInformation}

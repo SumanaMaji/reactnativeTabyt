@@ -98,6 +98,11 @@ async function getActivity() {
   return HttpClient.get(endpoint);
 }
 
+async function followOrganizer(data) {
+  let endpoint = 'organizer/follow';
+  return HttpClient.post(endpoint, data);
+}
+
 async function getAccount() {
   return await Storage.get('account');
 }
@@ -153,4 +158,5 @@ export default {
   viewOrganizerProfile,
   getActivity,
   uploadPic,
+  followOrganizer,
 };

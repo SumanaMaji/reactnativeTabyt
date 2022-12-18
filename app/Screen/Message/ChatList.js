@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
     height: moderateScale(40),
     borderRadius: moderateScale(20),
     marginRight: 10,
+    backgroundColor: COLORS.textInput,
   },
   live: {
     width: moderateScale(12),

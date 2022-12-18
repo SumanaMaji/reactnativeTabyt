@@ -15,42 +15,10 @@ import {Icon} from 'native-base';
 import moment from 'moment';
 import SimpleToast from 'react-native-simple-toast';
 import ReadMore from '@fawazahmed/react-native-read-more';
-
-const LIST = [
-  {
-    name: 'Lorem Ipsum',
-    count: 1,
-    price: 10,
-    selected: false,
-  },
-  {
-    name: 'Lorem Ipsum 2',
-    count: 1,
-    price: 15,
-    selected: false,
-  },
-  {
-    name: 'Another Ticket',
-    count: 1,
-    price: 20,
-    selected: false,
-  },
-  {
-    name: 'Ticket',
-    count: 1,
-    price: 50,
-    selected: false,
-  },
-  {
-    name: 'Ticket 2',
-    count: 1,
-    price: 35,
-    selected: false,
-  },
-];
+import Helper from '../../Service/Helper';
 
 const Tickets = props => {
-  const {currentSelection} = props;
+  const {currentSelection, eventData} = props;
   const [ticketsList, setticketsList] = useState(props.data);
   const [refresh, setrefresh] = useState(false);
 
@@ -82,7 +50,10 @@ const Tickets = props => {
     if (!ticketsList[index].selected) {
       return;
     }
-    if (ticketsList[index].count >= ticketsList[index].avl) {
+    if (
+      ticketsList[index].count >=
+      ticketsList[index].avl - ticketsList[index].purchased
+    ) {
       return;
     }
     let data = ticketsList;
@@ -134,37 +105,27 @@ const Tickets = props => {
       }}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {ticketsList.map((item, key) => {
-          // var dateFrom = moment(item.startDate).format('L');
-          // var dateTo = moment(item.endDate).format('L');
-          // var dateCheck = moment(new Date()).format('L');
-
-          var dateFrom =
-            moment(item.startDate).format('L') +
-            ' ' +
-            moment(item.startTime).format('LTS');
-          var dateTo =
-            moment(item.endDate).format('L') +
-            ' ' +
-            moment(item.endTime).format('LTS');
-          var dateCheck = moment().format('L') + ' ' + moment().format('LTS');
-
+          let checkStatus = Helper.ticketDateTimeStatus(
+            item.startDate,
+            item.startTime,
+            item.endDate,
+            item.endTime,
+            eventData?.timeZone,
+          );
+          console.log('checkStatus=>>', checkStatus);
           if (!item.isAvailable) {
             item.msg = 'Sold out!';
           }
-          if (
-            dateCheck >= dateFrom &&
-            dateCheck <= dateTo &&
-            item.isAvailable
-          ) {
+          if (checkStatus == 'live' && item.isAvailable) {
             item.isAvailable = true;
-          } else {
+          }
+          if (checkStatus == 'not_started' && item.isAvailable) {
+            item.msg = 'Sale not started yet!';
             item.isAvailable = false;
           }
-          if (dateCheck > dateFrom && dateCheck < dateTo) {
-            item.msg = 'Sale not started yet!';
-          }
-          if (dateCheck > dateTo && dateCheck > dateFrom) {
+          if (checkStatus == 'expired') {
             item.msg = 'Expired';
+            item.isAvailable = false;
           }
           return (
             <View
@@ -228,8 +189,9 @@ const Tickets = props => {
                           maxWidth: '80%',
                         },
                       ]}>
-                      Sales End - {moment(item?.endDate).format('ll')},{' '}
-                      {moment(item?.endTime).format('LT')}
+                      Sales End -{' '}
+                      {Helper.renderDate(item?.endDate, eventData?.timeZone)},{' '}
+                      {Helper.renderTime(item?.endTime, eventData?.timeZone)}
                     </Text>
                     <Text
                       style={[

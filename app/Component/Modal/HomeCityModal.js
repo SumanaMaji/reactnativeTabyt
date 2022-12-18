@@ -10,7 +10,15 @@ import GlobalStyles from '../GlobalStyle';
 import CustomImageBackground from '../ImageBackground/CustomImageBackground';
 
 const HomeCityModal = props => {
-  const {data, name, title, visible} = props;
+  const {
+    data,
+    name,
+    title,
+    visible,
+    setcityId,
+    setstateId,
+    setselectedStateCity,
+  } = props;
 
   console.log('data', data);
 
@@ -91,7 +99,12 @@ const HomeCityModal = props => {
             renderItem={({item}) => (
               <ListItem
                 //    bottomDivider
-                onPress={() => props.onClick(item)}
+                onPress={() => {
+                  setcityId(item._id.city);
+                  setstateId(item._id.state);
+                  setselectedStateCity(item);
+                  props.onClick(item);
+                }}
                 containerStyle={styles.list}>
                 <ListItem.Content>
                   <ListItem.Title style={styles.title}>

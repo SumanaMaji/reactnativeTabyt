@@ -5,7 +5,6 @@ import BackCross from '../../Component/Header/BackCross';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
 import FollowRequest from '../../Component/MyAccount/FollowRequest';
 import FollowUserList from '../../Component/MyAccount/FollowUserList';
-import UserList from '../../Component/MyAccount/UserList';
 import FullSearch from '../../Component/Search/FullSearch';
 import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';

@@ -21,6 +21,7 @@ import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
+import Helper from '../../Service/Helper';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 
@@ -261,8 +262,15 @@ const SingleEvent = props => {
                     fontSize: moderateScale(12.5),
                     marginLeft: 7,
                   }}>
-                  {renderEventDateTime(eventDetails?.startDate)} to{' '}
-                  {renderEventDateTime(eventDetails?.endDate)}
+                  {Helper.renderDate(
+                    eventDetails?.startDate,
+                    eventData?.timeZone,
+                  )}{' '}
+                  to{' '}
+                  {Helper.renderDate(
+                    eventDetails?.endDate,
+                    eventData?.timeZone,
+                  )}
                 </Text>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -278,8 +286,15 @@ const SingleEvent = props => {
                     fontSize: moderateScale(12.5),
                     marginLeft: 7,
                   }}>
-                  {moment(eventDetails?.startTime).format('LT')} -{' '}
-                  {moment(eventDetails?.endTime).format('LT')}
+                  {Helper.renderTime(
+                    eventDetails?.startTime,
+                    eventData?.timeZone,
+                  )}{' '}
+                  -{' '}
+                  {Helper.renderTime(
+                    eventDetails?.endTime,
+                    eventData?.timeZone,
+                  )}
                 </Text>
               </View>
               {eventDetails?.specialGuestsName.length > 0 ? (

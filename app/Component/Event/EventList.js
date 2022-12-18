@@ -1,5 +1,4 @@
 import React from 'react';
-import moment from 'moment';
 import {Icon} from 'native-base';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import FastImage from 'react-native-fast-image';
@@ -8,28 +7,29 @@ import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
+import Helper from '../../Service/Helper';
+import moment from 'moment';
+import momentTimezone from 'moment-timezone';
 
-const year = new Date().getFullYear();
-console.log('year-=>>', year);
 export default function EventList(props) {
   const {item} = props;
-
-  // console.log('item====>', item);
-
+  console.log('item=>>', item.name);
   const renderStatus = () => {
-    var dateFrom =
-      moment(item.startDate).format('L') +
-      ' ' +
-      moment(item.startTime).format('LTS');
-    var dateTo =
-      moment(item.endDate).format('L') +
-      ' ' +
-      moment(item.endTime).format('LTS');
-    var dateCheck = moment().format('L') + ' ' + moment().format('LTS');
-    console.log('dateFrom', dateFrom);
-    console.log('dateTo', dateTo);
-    console.log('dateCheck', dateCheck);
-    if (dateCheck >= dateFrom && dateCheck <= dateTo) {
+    // console.log('render time', new Date('2022-12-16T02:00:24.834Z').get);
+    // console.log(
+    //   'moment rc',
+    //   momentTimezone
+    //     .tz('2022-12-16T02:00:24.834Z', item?.timeZone)
+    //     .format('LT'),
+    // );
+    const timeCheckStatus = Helper.checkDateTimeStatus(
+      item.startDate,
+      item.startTime,
+      item.endDate,
+      item.endTime,
+      item?.timeZone,
+    );
+    if (timeCheckStatus) {
       return (
         <View
           style={{flexDirection: 'row', alignItems: 'center', marginBottom: 3}}>
@@ -151,11 +151,8 @@ export default function EventList(props) {
             style={{color: COLORS.white, fontSize: moderateScale(17)}}
             name="calendar"
             type="Ionicons"
-          />
-          {'  '}
-          {moment(item.startDate).format('YYYY') == year
-            ? moment(item.startDate).format('MMMM Do')
-            : moment(item.startDate).format('ll')}
+          />{' '}
+          {Helper.renderDate(item?.startDate, item?.timeZone)}
         </Text>
         <Text
           style={{
@@ -170,8 +167,9 @@ export default function EventList(props) {
             type="Ionicons"
           />
           {'  '}
-          {moment(item.startTime).format('LT')} -{' '}
-          {moment(item.endTime).format('LT')}
+          {Helper.renderTime(item?.startTime, item?.timeZone)}
+          {' - '}
+          {Helper.renderTime(item?.endTime, item?.timeZone)}
         </Text>
       </View>
     </Pressable>

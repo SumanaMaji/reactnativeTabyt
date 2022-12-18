@@ -21,9 +21,12 @@ const {width, height} = Dimensions.get('window');
 const TicketsList = props => {
   const {live, ticket, data, cancel} = props;
 
-  console.log('TicketsList data', data);
+  // console.log('TicketsList data', data);
 
   const checkLiveStatus = item => {
+    if (item.bookingStatus == 'cancel') {
+      return null;
+    }
     var dateFrom = moment(item?.eventsData?.startDate).format('L');
     var dateTo = moment(item?.eventsData?.endDate).format('L');
     var dateCheck = moment(new Date()).format('L');

@@ -18,7 +18,7 @@ const HomeSearch = props => {
         style={[
           GlobalStyles.textInputView,
           {
-            width: '80%',
+            width: '85%',
             borderRadius: 20,
             height: verticalScale(45),
             backgroundColor: '#406265',
@@ -50,9 +50,9 @@ const HomeSearch = props => {
         />
       </View>
       <Icon
-        name="git-pull-request"
-        type="Ionicons"
-        style={{color: COLORS.white, fontSize: moderateScale(23)}}
+        name="filter"
+        type="AntDesign"
+        style={{color: COLORS.white, fontSize: moderateScale(27)}}
       />
     </View>
   );

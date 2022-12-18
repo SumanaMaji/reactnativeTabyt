@@ -55,6 +55,7 @@ const SingleChat = props => {
     }
     setdisabled(true);
     const result = await Chat.sendMessage({
+      // sender: userData._id,
       sender: uId,
       message: msg,
       type: 'text',
@@ -72,6 +73,7 @@ const SingleChat = props => {
       <View style={{width: '100%', paddingBottom: 0, flex: 1}}>
         <FlatList
           data={allMsg}
+          inverted
           keyExtractor={item => item._id.toString()}
           style={{flex: 1, marginBottom: 15}}
           contentContainerStyle={{paddingBottom: 50}}
@@ -79,17 +81,32 @@ const SingleChat = props => {
             if (item?.userId == userData?._id) {
               item.userData = userData;
             }
+            if (userData._id == item?.sender) {
+              item.sendByme = true;
+            }
             return (
-              <View style={styles.mainView}>
+              <View
+                style={{
+                  ...styles.mainView,
+                  marginBottom: 20,
+                }}>
                 <View
                   style={{
-                    flexDirection: 'row',
+                    flexDirection: item?.sendByme ? 'row' : 'row-reverse',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <View
+                    style={{
+                      flexDirection: item?.sendByme ? 'row' : 'row-reverse',
+                      alignItems: 'center',
+                    }}>
                     <Image
-                      style={styles.image}
+                      style={{
+                        ...styles.image,
+                        marginRight: item?.sendByme ? 10 : 0,
+                        marginLeft: item?.sendByme ? 0 : 10,
+                      }}
                       source={{uri: BASE_DOMAIN + item.userData?.image}}
                     />
                     <Text style={styles.name}>
@@ -99,9 +116,8 @@ const SingleChat = props => {
                   <Text
                     style={[
                       styles.name,
-                      {fontSize: moderateScale(10), opacity: 0.8},
+                      {fontSize: moderateScale(10), opacity: 0.6},
                     ]}>
-                    {/* {moment(item?.createOn).startOf('hour').fromNow()} */}
                     {moment(item?.createOn).fromNow('LT')}
                   </Text>
                 </View>
@@ -112,8 +128,10 @@ const SingleChat = props => {
                     {
                       fontSize: moderateScale(11),
                       opacity: 0.9,
-                      marginTop: 5,
-                      marginLeft: moderateScale(40),
+                      marginTop: 0,
+                      marginLeft: moderateScale(item?.sendByme ? 40 : 0),
+                      marginRight: moderateScale(item?.sendByme ? 0 : 40),
+                      textAlign: item?.sendByme ? 'left' : 'right',
                     },
                   ]}>
                   {item.message}
@@ -144,7 +162,7 @@ const SingleChat = props => {
               value={msg}
               onChangeText={setmsg}
             />
-            <Icon name="attach" type="Ionicons" style={{color: COLORS.white}} />
+            {/* <Icon name="attach" type="Ionicons" style={{color: COLORS.white}} /> */}
           </View>
           <TouchableOpacity
             onPress={sendMsg}
@@ -188,6 +206,7 @@ const styles = StyleSheet.create({
     height: moderateScale(30),
     borderRadius: moderateScale(20),
     marginRight: 10,
+    backgroundColor: COLORS.textInput,
   },
   live: {
     width: moderateScale(12),

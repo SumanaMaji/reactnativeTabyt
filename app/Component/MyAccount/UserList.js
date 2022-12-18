@@ -17,103 +17,7 @@ import {moderateScale, verticalScale} from '../../PixelRatio';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import InviteModal from '../Modal/InviteModal';
-
-const USER_LIST = [
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '2 days ago',
-    name: 'Robert',
-    age: 24,
-    drink: 'Vodka',
-    desc: 'Lorem Ipsum is simply dummy text of the printing',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '1 days ago',
-    name: 'John Alan',
-    age: 26,
-    drink: 'Whisky',
-    live: true,
-    event: true,
-    desc: 'dummy text of the printing and typesetting industry.',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '2 days ago',
-    name: 'Robert',
-    age: 24,
-    drink: 'Vodka',
-    desc: 'Lorem Ipsum is simply dummy text of the printing',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '1 days ago',
-    name: 'John Alan',
-    age: 26,
-    drink: 'Whisky',
-    desc: 'dummy text of the printing and typesetting industry.',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '2 days ago',
-    name: 'Robert',
-    age: 24,
-    drink: 'Vodka',
-    live: true,
-    event: true,
-    desc: 'Lorem Ipsum is simply dummy text of the printing',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '1 days ago',
-    name: 'John Alan',
-    age: 26,
-    drink: 'Whisky',
-    desc: 'dummy text of the printing and typesetting industry.',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '2 days ago',
-    name: 'Robert',
-    age: 24,
-    drink: 'Vodka',
-    desc: 'Lorem Ipsum is simply dummy text of the printing',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '1 days ago',
-    name: 'John Alan',
-    age: 26,
-    drink: 'Whisky',
-    desc: 'dummy text of the printing and typesetting industry.',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '2 days ago',
-    name: 'Robert',
-    age: 24,
-    drink: 'Vodka',
-    desc: 'Lorem Ipsum is simply dummy text of the printing',
-  },
-  {
-    image:
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_5aeaS13y24e1D7KBOIPNUwGflPnLR8AuQQUQ6tHDnycRg_2woHNm3fX1K_UYtxizZw&usqp=CAU',
-    time: '1 days ago',
-    name: 'John Alan',
-    age: 26,
-    drink: 'Whisky',
-    desc: 'dummy text of the printing and typesetting industry.',
-  },
-];
+import _ from 'lodash';
 
 const UserList = props => {
   const {showPlus, showBottom, disableLive, event, data} = props;
@@ -131,7 +35,7 @@ const UserList = props => {
     <View style={{width: '100%', paddingBottom: 50}}>
       <ScrollView>
         <View style={{paddingBottom: 100}}>
-          {data.map((it, key) => (
+          {_.uniqBy(data, '_id').map((it, key) => (
             <Pressable
               key={key}
               style={styles.mainView}
@@ -161,7 +65,10 @@ const UserList = props => {
                     </Text>
                     <Text style={styles.shadow}>
                       Age: <Text style={styles.name}>{getAge(it)} </Text>|
-                      Favorite Drink: <Text style={styles.name}>{it.age}</Text>
+                      Favorite Drink:{' '}
+                      <Text style={styles.name}>
+                        {it.favoriteDrink.map((i, key) => i.name + ', ')}
+                      </Text>
                     </Text>
                   </View>
                 </View>
@@ -239,6 +146,7 @@ const styles = StyleSheet.create({
     height: moderateScale(40),
     borderRadius: moderateScale(20),
     marginRight: 10,
+    backgroundColor: COLORS.textInput,
   },
   live: {
     width: moderateScale(12),

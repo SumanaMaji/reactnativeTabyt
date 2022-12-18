@@ -155,6 +155,7 @@ export default function AuthModal(props) {
               }}
             />
           )}
+
           <View
             style={{
               flexDirection: 'row',
@@ -190,6 +191,17 @@ export default function AuthModal(props) {
             onPress={verifyUser}
             disabled={disabled}
           />
+          {props.showText ? (
+            <Text
+              style={{
+                color: COLORS.black,
+                fontFamily: FONTS.Regular,
+                fontSize: 12,
+                marginTop: 5,
+              }}>
+              {props.showText}
+            </Text>
+          ) : null}
         </View>
       </View>
     </KeyboardAwareScrollView>

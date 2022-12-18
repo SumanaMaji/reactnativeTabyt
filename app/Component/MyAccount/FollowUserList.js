@@ -16,6 +16,7 @@ import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
+import Helper from '../../Service/Helper';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import InviteModal from '../Modal/InviteModal';
@@ -49,15 +50,27 @@ const FollowUserList = props => {
       <ScrollView>
         <View style={{paddingBottom: 100}}>
           {data.map((it, key) => {
+            let uData = it?.userData;
+            if (uData.userType === 'Organizer') {
+              console.log('it.name=>', uData);
+              uData.organizer = true;
+              uData.firstname = uData.name;
+            } else {
+              uData.organizer = false;
+            }
             return (
               <Pressable
                 key={key}
                 style={styles.mainView}
                 onPress={() =>
-                  Navigation.navigate('ViewUserProfile', {
-                    uname: it?.userData?.firstname,
-                    uId: it?.userData?._id,
-                  })
+                  uData?.organizer
+                    ? Navigation.navigate('ViewOrganizer', {
+                        oId: uData._id,
+                      })
+                    : Navigation.navigate('ViewUserProfile', {
+                        uname: uData.firstname,
+                        uId: uData._id,
+                      })
                 }>
                 <View
                   style={{
@@ -68,26 +81,31 @@ const FollowUserList = props => {
                   <View style={{flexDirection: 'row'}}>
                     <Image
                       style={styles.image}
-                      source={{uri: BASE_DOMAIN + it?.userData?.image}}
+                      source={{uri: BASE_DOMAIN + uData.image}}
                     />
                     {it.live && !disableLive ? (
                       <View style={styles.live} />
                     ) : null}
-                    <View>
+                    <View style={{maxWidth: '85%'}}>
                       <Text style={styles.name}>
-                        {it?.userData?.firstname} {it?.userData?.lastname}
+                        {uData.firstname} {uData.lastname}
                       </Text>
-                      <Text style={styles.shadow}>
-                        Age:{' '}
-                        <Text style={styles.name}>{getAge(it?.userData)} </Text>
-                        | Favorite Drink:{' '}
-                        <Text style={styles.name}>
-                          {/* {Object.keys(it).length > 0 &&
-                          it?.userData?.favoriteDrink.length > 0
-                            ? it?.userData?.favoriteDrink[0]?.name
-                            : null} */}
+                      {uData.organizer ? (
+                        <Text style={styles.shadow}>
+                          {uData?.organizerInformation} | {uData?.website}
                         </Text>
-                      </Text>
+                      ) : (
+                        <Text style={styles.shadow}>
+                          Age:{' '}
+                          <Text style={styles.name}>
+                            {getAge(it?.userData)}{' '}
+                          </Text>
+                          | Favorite Drink:{' '}
+                          <Text style={styles.name}>
+                            {Helper.renderFavDrinks(uData?.favoriteDrink)}
+                          </Text>
+                        </Text>
+                      )}
                     </View>
                   </View>
                 </View>
@@ -136,6 +154,7 @@ const styles = StyleSheet.create({
     height: moderateScale(40),
     borderRadius: moderateScale(20),
     marginRight: 10,
+    backgroundColor: COLORS.textInput,
   },
   live: {
     width: moderateScale(12),

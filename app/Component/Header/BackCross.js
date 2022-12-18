@@ -13,6 +13,7 @@ export default function BackCross({
   getCallBack,
   onBackPress,
   moreIcon,
+  type,
 }) {
   const [modal, setmodal] = useState(false);
 
@@ -45,10 +46,11 @@ export default function BackCross({
 
       <View style={{flexDirection: 'row'}}>
         <Text
+          numberOfLines={1}
           style={{
             color: COLORS.white,
             fontFamily: FONTS.Regular,
-            fontSize: moderateScale(18),
+            fontSize: moderateScale(type == 'order' ? 11.5 : 18),
           }}>
           {title}
         </Text>

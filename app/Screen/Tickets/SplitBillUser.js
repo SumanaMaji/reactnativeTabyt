@@ -39,6 +39,7 @@ const SplitBillUser = props => {
   const [totalSplitUser, settotalSplitUser] = useState('');
   const [splitMoney, setsplitMoney] = useState('');
   const [splitUser, setsplitUser] = useState([]);
+  const [isLoading, setisLoading] = useState(false);
 
   useEffect(() => {
     getSplitBillUser();
@@ -50,6 +51,7 @@ const SplitBillUser = props => {
     if (result && result.status) {
       setsplitGuest(result.data);
     }
+    setisLoading(true);
   };
 
   const searchUser = async () => {
@@ -236,11 +238,13 @@ const SplitBillUser = props => {
             </Text>
           </View>
         </View>
-        <TouchableOpacity
-          onPress={() => setinviteModal(true)}
-          style={{...styles.plusButton, width: '23%'}}>
-          <Text style={{color: COLORS.theme}}>Add user</Text>
-        </TouchableOpacity>
+        {splitGuest.length >= 4 ? null : (
+          <TouchableOpacity
+            onPress={() => setinviteModal(true)}
+            style={{...styles.plusButton, width: '23%'}}>
+            <Text style={{color: COLORS.theme}}>Add user</Text>
+          </TouchableOpacity>
+        )}
       </Pressable>
       <FlatList
         data={splitGuest}

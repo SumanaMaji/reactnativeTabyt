@@ -16,6 +16,7 @@ import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
+import Helper from '../../Service/Helper';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import InviteModal from '../Modal/InviteModal';
@@ -24,6 +25,8 @@ const FollowRequest = props => {
   const {showPlus, showBottom, disableLive, event, data, userId} = props;
 
   const [modal, setModal] = useState(false);
+
+  // console.log('FollowRequest=>>', data);
 
   const getAge = it => {
     const a = moment([moment(new Date()).format('YYYY', 'MM')]);
@@ -37,6 +40,7 @@ const FollowRequest = props => {
       status: status,
       accpect: status,
     });
+
     console.log('result=>>', result);
     if (result && result.status) {
       SimpleToast.show(
@@ -54,100 +58,114 @@ const FollowRequest = props => {
     <View style={{width: '100%', paddingBottom: 50}}>
       <ScrollView>
         <View style={{paddingBottom: 100}}>
-          {data.map((it, key) => {
-            let own = true;
-            let uData = {};
-            if (it?.sender == userId) {
-              uData = it?.receiverData;
-            } else {
-              own = false;
-              uData = it?.senderData;
-            }
-            return (
-              <Pressable
-                key={key}
-                style={styles.mainView}
-                onPress={() =>
-                  Navigation.navigate('ViewUserProfile', {
-                    uname: uData.firstname,
-                    uId: uData._id,
-                  })
-                }>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <View style={{flexDirection: 'row'}}>
-                    <Image
-                      style={styles.image}
-                      source={{uri: BASE_DOMAIN + uData.image}}
-                    />
-                    {it.live && !disableLive ? (
-                      <View style={styles.live} />
-                    ) : null}
-                    <View>
-                      <Text style={styles.name}>
-                        {uData.firstname} {uData.lastname}
-                      </Text>
-                      <Text style={styles.shadow}>
-                        Age: <Text style={styles.name}>{getAge(uData)} </Text>|
-                        Favorite Drink:{' '}
-                        <Text style={styles.name}>
-                          {Object.keys(it).length > 0 &&
-                          uData.favoriteDrink.length > 0
-                            ? uData.favoriteDrink[0]?.name
-                            : null}
-                        </Text>
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                {own ? (
-                  <TouchableOpacity
-                    onPress={() => responseRequest(it, false, true)}
-                    style={{
-                      ...styles.acceptButton,
-                      width: '45%',
-                      marginLeft: moderateScale(45),
-                    }}>
-                    <Text style={styles.butTxt}>Cacel Request</Text>
-                  </TouchableOpacity>
-                ) : (
+          {data &&
+            data.length > 0 &&
+            data.map((it, key) => {
+              let own = true;
+              let uData = {};
+              if (it?.sender == userId) {
+                uData = it?.receiverData;
+              } else {
+                own = false;
+                uData = it?.senderData;
+              }
+              if (uData.userType === 'Organizer') {
+                console.log('it.name=>', uData);
+                uData.organizer = true;
+                uData.firstname = uData.name;
+              } else {
+                uData.organizer = false;
+              }
+              return (
+                <Pressable
+                  key={key}
+                  style={styles.mainView}
+                  onPress={() =>
+                    Navigation.navigate('ViewUserProfile', {
+                      uname: uData.firstname,
+                      uId: uData._id,
+                    })
+                  }>
                   <View
                     style={{
                       flexDirection: 'row',
-                      marginLeft: moderateScale(45),
-                      marginTop: 3,
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}>
+                    <View style={{flexDirection: 'row'}}>
+                      <Image
+                        style={styles.image}
+                        source={{uri: BASE_DOMAIN + uData.image}}
+                      />
+                      {it.live && !disableLive ? (
+                        <View style={styles.live} />
+                      ) : null}
+                      <View style={{maxWidth: '90%'}}>
+                        <Text style={styles.name}>
+                          {uData.firstname} {uData.lastname}
+                        </Text>
+                        {uData.organizer ? (
+                          <Text style={styles.shadow}>
+                            {uData?.organizerInformation} | {uData?.website}
+                          </Text>
+                        ) : (
+                          <Text style={styles.shadow}>
+                            Age:{' '}
+                            <Text style={styles.name}>{getAge(uData)} </Text>|
+                            Favorite Drink:{' '}
+                            <Text style={styles.name}>
+                              {Helper.renderFavDrinks(uData.favoriteDrink)}
+                            </Text>
+                          </Text>
+                        )}
+                      </View>
+                    </View>
+                  </View>
+                  {own ? (
                     <TouchableOpacity
-                      onPress={() => responseRequest(it, true)}
-                      style={styles.acceptButton}>
-                      <Text style={styles.butTxt}>Accept</Text>
+                      onPress={() => responseRequest(it, false, true)}
+                      style={{
+                        ...styles.acceptButton,
+                        width: '45%',
+                        marginLeft: moderateScale(45),
+                      }}>
+                      <Text style={styles.butTxt}>Cacel Request</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => responseRequest(it, false)}
-                      style={[
-                        styles.acceptButton,
-                        {borderColor: COLORS.cream},
-                      ]}>
-                      <Text style={[styles.butTxt, {color: COLORS.cream}]}>
-                        Reject
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginLeft: moderateScale(45),
+                        marginTop: 3,
+                      }}>
+                      <TouchableOpacity
+                        onPress={() => responseRequest(it, true)}
+                        style={styles.acceptButton}>
+                        <Text style={styles.butTxt}>Accept</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => responseRequest(it, false)}
+                        style={[
+                          styles.acceptButton,
+                          {borderColor: COLORS.cream},
+                        ]}>
+                        <Text style={[styles.butTxt, {color: COLORS.cream}]}>
+                          Reject
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  {it.event && event ? (
+                    <View style={styles.event}>
+                      <Text
+                        style={[styles.name, {fontSize: moderateScale(10)}]}>
+                        UPCOMING EVENT
                       </Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-                {it.event && event ? (
-                  <View style={styles.event}>
-                    <Text style={[styles.name, {fontSize: moderateScale(10)}]}>
-                      UPCOMING EVENT
-                    </Text>
-                  </View>
-                ) : null}
-              </Pressable>
-            );
-          })}
+                    </View>
+                  ) : null}
+                </Pressable>
+              );
+            })}
         </View>
       </ScrollView>
       <Modal
@@ -183,6 +201,7 @@ const styles = StyleSheet.create({
     height: moderateScale(40),
     borderRadius: moderateScale(20),
     marginRight: 10,
+    backgroundColor: COLORS.textInput,
   },
   live: {
     width: moderateScale(12),

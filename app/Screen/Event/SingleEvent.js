@@ -26,6 +26,7 @@ import {moderateScale, verticalScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
+import Helper from '../../Service/Helper';
 
 const MIN_HEIGHT = moderateScale(120);
 const MAX_HEIGHT = moderateScale(220);
@@ -88,20 +89,15 @@ const SingleEvent = props => {
   };
 
   const renderStatus = () => {
-    // var dateFrom = moment(eventDetails.startDate).format('L');
-    // var dateTo = moment(eventDetails.endDate).format('L');
-    // var dateCheck = moment(new Date()).format('L');
+    const timeCheckStatus = Helper.checkDateTimeStatus(
+      eventDetails.startDate,
+      eventDetails.startTime,
+      eventDetails.endDate,
+      eventDetails.endTime,
+      eventDetails?.timeZone,
+    );
 
-    var dateFrom =
-      moment(eventDetails.startDate).format('L') +
-      ' ' +
-      moment(eventDetails.startTime).format('LTS');
-    var dateTo =
-      moment(eventDetails.endDate).format('L') +
-      ' ' +
-      moment(eventDetails.endTime).format('LTS');
-    var dateCheck = moment().format('L') + ' ' + moment().format('LTS');
-    if (dateCheck >= dateFrom && dateCheck <= dateTo) {
+    if (timeCheckStatus) {
       return (
         <View
           style={{
@@ -285,8 +281,15 @@ const SingleEvent = props => {
                     fontSize: moderateScale(12.5),
                     marginLeft: 7,
                   }}>
-                  {renderEventDateTime(eventDetails?.startDate)} to{' '}
-                  {renderEventDateTime(eventDetails?.endDate)}
+                  {Helper.renderDate(
+                    eventDetails?.startDate,
+                    eventData?.timeZone,
+                  )}{' '}
+                  to{' '}
+                  {Helper.renderDate(
+                    eventDetails?.endDate,
+                    eventData?.timeZone,
+                  )}
                 </Text>
               </View>
               <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -302,8 +305,15 @@ const SingleEvent = props => {
                     fontSize: moderateScale(12.5),
                     marginLeft: 7,
                   }}>
-                  {moment(eventDetails?.startTime).format('LT')} -{' '}
-                  {moment(eventDetails?.endTime).format('LT')}
+                  {Helper.renderTime(
+                    eventDetails?.startTime,
+                    eventData?.timeZone,
+                  )}{' '}
+                  -{' '}
+                  {Helper.renderTime(
+                    eventDetails?.endTime,
+                    eventData?.timeZone,
+                  )}
                 </Text>
               </View>
               {eventDetails?.specialGuestsName.length > 0 ? (

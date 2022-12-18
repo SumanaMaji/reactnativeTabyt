@@ -10,6 +10,7 @@ import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
+import Helper from '../../Service/Helper';
 
 const MyEventList = () => {
   const isFocused = useIsFocused();
@@ -30,9 +31,11 @@ const MyEventList = () => {
       setcompleteEvent(
         result.data.filter(
           it =>
-            moment(new Date()).format('L') >
-              moment(it?.eventsData?.endDate).format('L') &&
-            it.bookingStatus === 'complete',
+            Helper.eventCompleteCheck(
+              it?.eventsData?.endDate,
+              it?.eventsData?.endTime,
+              it?.eventsData?.timeZone,
+            ) && it.bookingStatus === 'complete',
         ),
       );
       setcanceledEvent(result.data.filter(it => it.bookingStatus == 'cancel'));

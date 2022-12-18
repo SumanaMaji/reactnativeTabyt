@@ -63,6 +63,11 @@ const EditProfile = () => {
   const [gender, setgender] = React.useState(userData.gender);
   const [firstname, setfirstname] = React.useState(userData.firstname);
   const [lastname, setlastname] = React.useState(userData.lastname);
+  const [relationshipStatus, setrelationshipStatus] = React.useState(
+    userData.relationship,
+  );
+  const [profession, setprofession] = React.useState(userData.profession);
+  const [bio, setbio] = React.useState(userData.bio);
   const [zip, setzip] = React.useState(JSON.stringify(userData.zipcode));
   const [email, setemail] = React.useState(userData.email);
   const [mobile, setmobile] = React.useState(
@@ -222,7 +227,10 @@ const EditProfile = () => {
       gender == '' ||
       city == '' ||
       dob == 'DOB' ||
-      mobile == ''
+      mobile == '' ||
+      relationshipStatus == '' ||
+      profession == '' ||
+      bio == ''
     ) {
       Toast.show('Please fill out all fields!');
       return;
@@ -257,6 +265,9 @@ const EditProfile = () => {
       phone: mobile,
       firstname: firstname,
       lastname: lastname,
+      relationship: relationshipStatus,
+      profession: profession,
+      bio: bio,
       gender: gender,
       dob: dob,
       zipcode: Number(zip),
@@ -495,6 +506,27 @@ const EditProfile = () => {
               onSelect={(val, item) => setethncity(val)}
               placeholder="Ethncity"
               selectedValue={ethncity}
+            />
+            <TextInput
+              placeholder="Relationship Status"
+              placeholderTextColor={COLORS.white}
+              style={GlobalStyles.textInput}
+              value={relationshipStatus}
+              onChangeText={val => setrelationshipStatus(val)}
+            />
+            <TextInput
+              placeholder="Profession"
+              placeholderTextColor={COLORS.white}
+              style={GlobalStyles.textInput}
+              value={profession}
+              onChangeText={val => setprofession(val)}
+            />
+            <TextInput
+              placeholder="Bio"
+              placeholderTextColor={COLORS.white}
+              style={GlobalStyles.textInput}
+              value={bio}
+              onChangeText={val => setbio(val)}
             />
             <TextInput
               placeholder="Postal Code"

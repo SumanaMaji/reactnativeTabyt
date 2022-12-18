@@ -102,6 +102,7 @@ const MakeReservation = props => {
             // data={eventData?.tickets.filter(
             //   i => i.gender == userData.gender || i.gender == 'All',
             // )}
+            eventData={eventData}
             data={allTickets}
             currentSelection={currentSelection}
             selectedCallback={data => {

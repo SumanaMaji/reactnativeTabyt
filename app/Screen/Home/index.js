@@ -19,16 +19,23 @@ export default function Home() {
   const [selectedStateCity, setselectedStateCity] = React.useState({});
   const [defaultCityState, setdefaultCityState] =
     React.useState('New York City, NY');
+  const [cityId, setcityId] = React.useState(122795);
+  const [stateId, setstateId] = React.useState(1452);
 
   useEffect(() => {
     getEvents();
   }, []);
 
   const getEvents = async () => {
+    // console.warn('cityId - ', cityId);
     const result = await Event.getAllEvent();
     console.log('event data', JSON.stringify(result));
     if (result && result.status) {
-      setallEvent(result.data.filter(i => i.city == 122795 && i.state == 1452));
+      // console.warn('cityId - ', cityId);
+      console.log('setselectedStateCity', selectedStateCity, cityId);
+      setallEvent(
+        result.data.filter(i => i.city == cityId && i.state == stateId),
+      );
       setallEventBackup(result.data);
       setisFetching(false);
     }
@@ -42,18 +49,35 @@ export default function Home() {
     setallEvent(result);
   };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = () => {
     setRefreshing(true);
     getEvents();
-    setselectedStateCity({});
-  }, []);
+    // setselectedStateCity({});
+  };
 
   const filterEvent = item => {
+    // console.warn('filterEvent', item._id.city);
+    console.log('item=>>', item);
     const data = allEventBackup.filter(
-      i => i.city == item._id.city && i.state == item._id.state,
+      i => i.city == cityId && i.state == stateId,
     );
-    setallEvent(data);
+
+    // allEventBackup.filter(
+    //   i => i.city == item._id.city && i.state == item._id.state,
+    // );
+    // setallEvent(
+    //   allEventBackup.filter(i => i.city == cityId && i.state == stateId),
+    // );
+    setisFetching(false);
   };
+
+  useEffect(() => {
+    if (cityId == selectedStateCity?.cityData?.id) {
+      setallEvent(
+        allEventBackup.filter(i => i.city == cityId && i.state == stateId),
+      );
+    }
+  }, [cityId]);
 
   return (
     <CustomImageBackground>
@@ -101,9 +125,11 @@ export default function Home() {
         Close={() => setcityStateModal(false)}
         onClick={data => {
           filterEvent(data);
-          setselectedStateCity(data);
           setcityStateModal(false);
         }}
+        setcityId={setcityId}
+        setstateId={setstateId}
+        setselectedStateCity={setselectedStateCity}
       />
     </CustomImageBackground>
   );

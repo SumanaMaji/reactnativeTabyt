@@ -314,6 +314,7 @@ const MyEventAbout = props => {
             setcancelModal(true);
           }}
           userData={userData}
+          showText="Note. All Purchases on the Tabyt Platform are non-refundable. Would you like to proceed with this Cancelation"
         />
       </Modal>
       <Modal
