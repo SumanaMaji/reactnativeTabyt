@@ -6,6 +6,7 @@ import {
   Animated,
   Image,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -27,6 +28,10 @@ import Event from '../../Service/Event';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import Helper from '../../Service/Helper';
+import Location from '../../Component/Event/Location';
+import EventName from '../../Component/Event/EventName';
+import EventOrganizedBy from '../../Component/Event/EventOrganizedBy';
+import EventDateTime from '../../Component/Event/EventDateTime';
 
 const MIN_HEIGHT = moderateScale(120);
 const MAX_HEIGHT = moderateScale(220);
@@ -88,47 +93,6 @@ const SingleEvent = props => {
     }
   };
 
-  const renderStatus = () => {
-    const timeCheckStatus = Helper.checkDateTimeStatus(
-      eventDetails.startDate,
-      eventDetails.startTime,
-      eventDetails.endDate,
-      eventDetails.endTime,
-      eventDetails?.timeZone,
-    );
-
-    if (timeCheckStatus) {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 3,
-          }}>
-          <View
-            style={{
-              width: 13,
-              height: 13,
-              borderWidth: 3,
-              backgroundColor: COLORS.green,
-              borderColor: COLORS.textInput,
-              borderRadius: 15,
-              marginRight: 5,
-            }}
-          />
-          <Text
-            style={{
-              color: COLORS.green,
-              fontFamily: FONTS.Medium,
-              fontSize: moderateScale(11),
-            }}>
-            Live
-          </Text>
-        </View>
-      );
-    }
-  };
-
   return (
     <CustomImageBackground>
       {isFetching ? (
@@ -171,151 +135,24 @@ const SingleEvent = props => {
                 paddingTop: moderateScale(10),
                 paddingBottom: moderateScale(100),
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Pressable
-                  onPress={() => Navigation.navigate('LocationView')}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '75%',
-                  }}>
-                  <Icon
-                    name="md-location-sharp"
-                    type="Ionicons"
-                    style={{color: COLORS.button, fontSize: moderateScale(18)}}
-                  />
-                  <Text
-                    style={{
-                      color: COLORS.button,
-                      fontFamily: FONTS.Medium,
-                      fontSize: moderateScale(13),
-                      width: '100%',
-                    }}
-                    numberOfLines={1}>
-                    {eventDetails.address}, {eventDetails?.cityData?.name},{' '}
-                    {eventDetails?.stateData?.name}
-                  </Text>
-                </Pressable>
-
-                {renderStatus()}
-              </View>
-              <Text
-                // numberOfLines={2}
-                style={{
-                  color: COLORS.white,
-                  fontFamily: FONTS.Medium,
-                  fontSize: moderateScale(15.5),
-                  lineHeight: 20,
-                  marginTop: 10,
-                }}>
-                {eventDetails.name}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 3,
-                  marginBottom: 2,
-                }}>
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Regular,
-                    fontSize: moderateScale(11),
-                    opacity: 0.8,
-                  }}>
-                  Organized by:{' '}
-                  <Text
-                    onPress={() =>
-                      Navigation.navigate('ViewOrganizer', {
-                        oId: eventData?.organizerId,
-                      })
-                    }
-                    style={{
-                      textDecorationLine: 'underline',
-                      color: COLORS.theme,
-                    }}>
-                    {eventData?.organizerData?.name}
-                  </Text>
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 10,
-                  }}>
-                  <StarRating
-                    disabled={false}
-                    maxStars={5}
-                    rating={avgRating}
-                    starSize={10}
-                    starStyle={{color: COLORS.orange}}
-                  />
-                  <Text
-                    style={{
-                      color: COLORS.white,
-                      fontFamily: FONTS.Regular,
-                      fontSize: moderateScale(10),
-                      marginLeft: 5,
-                    }}>
-                    {avgRating}
-                  </Text>
-                </View>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon
-                  style={{color: COLORS.white, fontSize: moderateScale(17)}}
-                  name="calendar"
-                  type="Ionicons"
-                />
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Medium,
-                    fontSize: moderateScale(12.5),
-                    marginLeft: 7,
-                  }}>
-                  {Helper.renderDate(
-                    eventDetails?.startDate,
-                    eventData?.timeZone,
-                  )}{' '}
-                  to{' '}
-                  {Helper.renderDate(
-                    eventDetails?.endDate,
-                    eventData?.timeZone,
-                  )}
-                </Text>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon
-                  style={{color: COLORS.white, fontSize: moderateScale(17)}}
-                  name="alarm"
-                  type="Ionicons"
-                />
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Medium,
-                    fontSize: moderateScale(12.5),
-                    marginLeft: 7,
-                  }}>
-                  {Helper.renderTime(
-                    eventDetails?.startTime,
-                    eventData?.timeZone,
-                  )}{' '}
-                  -{' '}
-                  {Helper.renderTime(
-                    eventDetails?.endTime,
-                    eventData?.timeZone,
-                  )}
-                </Text>
-              </View>
+              <EventName data={eventDetails} />
+              <EventOrganizedBy
+                organizerName={eventDetails?.organizerData?.name}
+                oId={eventDetails?.organizerId}
+                avgRating={avgRating}
+              />
+              <Location
+                address={eventDetails?.address}
+                cityData={eventDetails?.cityData}
+                stateData={eventDetails?.stateData}
+              />
+              <EventDateTime
+                startDate={eventDetails?.startDate}
+                endDate={eventDetails?.endDate}
+                startTime={eventDetails?.startTime}
+                endTime={eventDetails?.endTime}
+                timeZone={eventData?.timeZone}
+              />
               {eventDetails?.specialGuestsName.length > 0 ? (
                 <Text
                   style={{
@@ -572,7 +409,7 @@ const SingleEvent = props => {
                 </TouchableOpacity>
               ) : null}
 
-              <View
+              {/* <View
                 style={{
                   flexDirection: 'row',
                   alignItems: 'flex-start',
@@ -601,7 +438,7 @@ const SingleEvent = props => {
                   }}>
                   GET SUPPORT
                 </Text>
-              </View>
+              </View> */}
             </View>
           </ScrollView>
           <View
@@ -631,7 +468,7 @@ const SingleEvent = props => {
       </Modal>
       <Modal
         visible={ImgModal}
-        transparent={true}
+        animationType="fade"
         onRequestClose={() => setImgmodal(false)}>
         <View style={{flex: 1, backgroundColor: COLORS.white}}>
           <FastImage
@@ -644,7 +481,12 @@ const SingleEvent = props => {
           />
           <TouchableOpacity
             onPress={() => setImgmodal(false)}
-            style={{position: 'absolute', top: 20, left: 15, zIndex: 99}}>
+            style={{
+              position: 'absolute',
+              top: Platform.OS == 'ios' ? 40 : 20,
+              left: 15,
+              zIndex: 99,
+            }}>
             <Icon
               name="keyboard-arrow-left"
               type="MaterialIcons"

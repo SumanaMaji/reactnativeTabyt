@@ -71,7 +71,7 @@ const MakeReservation = props => {
               TICKETS
             </Text>
           </Pressable>
-          <Pressable
+          {/* <Pressable
             onPress={() => setactive(1)}
             style={[
               styles.titleView,
@@ -80,13 +80,13 @@ const MakeReservation = props => {
             <Text numberOfLines={1} style={styles.title}>
               JOIN LIST
             </Text>
-          </Pressable>
+          </Pressable> */}
           <Pressable
             onPress={() => setactive(2)}
             style={[
               styles.titleView,
               {
-                width: '40%',
+                // width: '40%',
                 borderColor: active == 2 ? COLORS.white : COLORS.theme,
               },
             ]}>
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   titleView: {
     borderBottomWidth: 2,
     borderColor: COLORS.theme,
-    width: '30%',
+    width: '50%',
     paddingVertical: 15,
     justifyContent: 'center',
     alignItems: 'center',

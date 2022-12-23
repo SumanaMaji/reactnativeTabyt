@@ -12,6 +12,7 @@ import {
 import SimpleToast from 'react-native-simple-toast';
 import {useSelector} from 'react-redux';
 import GradientButton from '../../Component/Button/GradientButton';
+import PaymentCard from '../../Component/Checkout/PaymentCard';
 import ReservationHeader from '../../Component/Header/BackCross';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
 import OverlayLoader from '../../Component/Loader/OverlayLoader.js';
@@ -50,6 +51,7 @@ const Checkout2 = props => {
   const [disabled, setdisabled] = useState(false);
   const [cardModal, setcardModal] = useState(false);
   const [continueBooking, setcontinueBooking] = useState(false);
+  const [depositAmt, setdepositAmt] = useState('0');
 
   useEffect(() => {
     if (currentSelection == 'ticket') {
@@ -60,24 +62,25 @@ const Checkout2 = props => {
       if (eventData?.tax) {
         settax(Number((subTotal * eventData?.tax) / 100).toFixed(2));
       }
-      if (eventData?.tips) {
-        settips(Number((subTotal * eventData?.tips) / 100).toFixed(2));
-      }
+      // if (eventData?.tips) {
+      //   settips(Number((subTotal * eventData?.tips) / 100).toFixed(2));
+      // }
       let totalAmt = subTotal;
       if (eventData?.tax) {
-        totalAmt =
-          (subTotal * eventData?.tax) / 100 +
-          (subTotal * eventData?.tips) / 100 +
-          subTotal;
+        totalAmt = (subTotal * eventData?.tax) / 100 + subTotal;
         settotal(Number(totalAmt).toFixed(2));
+        setdepositAmt(Number(totalAmt));
         settotalWithDiscount(totalAmt);
       } else {
         settotal(Number(totalAmt).toFixed(2));
+        setdepositAmt(Number(totalAmt));
         settotalWithDiscount(totalAmt);
       }
-      if (eventData?.deposit && eventData.depositMin <= subTotal) {
-        setdue(Number((totalAmt * eventData?.deposit) / 100).toFixed(2));
-      }
+
+      // if (eventData?.deposit && eventData.depositMin <= subTotal) {
+      //   setdue(Number((totalAmt * eventData?.deposit) / 100).toFixed(2));
+      //   setdepositAmt()
+      // }
     }
     if (currentSelection == 'reservation') {
       const subTotal = selectedItem.reduce((accumulator, object) => {
@@ -103,7 +106,12 @@ const Checkout2 = props => {
         settotalWithDiscount(totalAmt);
       }
       if (eventData?.deposit && eventData.depositMin <= subTotal) {
-        setdue(Number((totalAmt * eventData?.deposit) / 100).toFixed(2));
+        setdue(
+          Number(totalAmt - (totalAmt * eventData?.deposit) / 100).toFixed(2),
+        );
+        setdepositAmt(Number(totalAmt * eventData?.deposit) / 100);
+      } else {
+        setdepositAmt(Number(totalAmt));
       }
     }
   }, [selectedItem]);
@@ -182,8 +190,6 @@ const Checkout2 = props => {
       } else {
         setcardModal(true);
       }
-
-      // setmodal(true);
     }
   };
 
@@ -250,7 +256,7 @@ const Checkout2 = props => {
     const data = {
       source: cardData?.cardId,
       BookingId: bookingId,
-      amount: total,
+      amount: depositAmt,
     };
     console.log('payment payload=>>', data);
     const result = await Event.payNow(data);
@@ -300,40 +306,17 @@ const Checkout2 = props => {
       <OverlayLoader show={disabled} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{paddingBottom: 70}}>
-          <View style={styles.list}>
-            {cardData && Object.keys(cardData).length > 0 ? (
-              <View style={styles.subList}>
-                <Text style={styles.semiboldTxt}>Payment Method</Text>
-                <Text
-                  style={{...styles.regularTxt, marginLeft: 10}}
-                  adjustsFontSizeToFit>
-                  xxx{' '}
-                  {cardData?.cardNumber.substr(cardData?.cardNumber.length - 4)}{' '}
-                  | {cardData?.type}
-                </Text>
-              </View>
-            ) : null}
-            <Pressable
-              style={styles.subList}
-              onPress={() => {
-                setcontinueBooking(false);
-                setcardModal(true);
-              }}
-              // onPress={() => Navigation.navigate('PaymentInfo')}
-            >
-              <Text style={styles.semiboldTxt}>Select New Payment Method</Text>
-              <Icon
-                name="keyboard-arrow-right"
-                type="MaterialIcons"
-                style={{color: COLORS.white}}
-              />
-            </Pressable>
-          </View>
-
+          <PaymentCard
+            cardData={cardData}
+            newPaymentCallbBack={() => {
+              setcontinueBooking(false);
+              setcardModal(true);
+            }}
+          />
           <View style={[styles.list, {paddingVertical: moderateScale(20)}]}>
             <View style={styles.subList}>
               <Text style={styles.extraboldTxt}>
-                Total Reservation ( {selectedItem.length} )
+                Your Items ( {selectedItem.length} )
               </Text>
             </View>
             {currentSelection === 'ticket' &&
@@ -414,8 +397,8 @@ const Checkout2 = props => {
 
           <View style={styles.gaplist}>
             <View style={styles.subList}>
-              <Text style={styles.regularTxt}>Subtotal</Text>
-              <Text style={styles.regularTxt}>${subtotal}</Text>
+              <Text style={styles.semiboldTxt}>Subtotal</Text>
+              <Text style={styles.semiboldTxt}>${subtotal}</Text>
             </View>
             {eventData?.tax ? (
               <>
@@ -423,10 +406,14 @@ const Checkout2 = props => {
                   <Text style={styles.regularTxt}>Tax: {eventData?.tax}%</Text>
                   <Text style={styles.regularTxt}>${tax}</Text>
                 </View>
-                <View style={styles.subList}>
-                  <Text style={styles.regularTxt}>Tip: {eventData?.tips}%</Text>
-                  <Text style={styles.regularTxt}>${tips}</Text>
-                </View>
+                {currentSelection == 'ticket' ? null : (
+                  <View style={styles.subList}>
+                    <Text style={styles.regularTxt}>
+                      Tip: {eventData?.tips}%
+                    </Text>
+                    <Text style={styles.regularTxt}>${tips}</Text>
+                  </View>
+                )}
               </>
             ) : null}
           </View>
@@ -439,7 +426,7 @@ const Checkout2 = props => {
               </Text>
             </View>
           </View>
-          {eventData?.tax ? (
+          {currentSelection == 'ticket' ? null : eventData?.tax ? (
             <>
               <View style={styles.gaplist}>
                 <View style={styles.subList}>
@@ -450,7 +437,7 @@ const Checkout2 = props => {
               <View style={styles.gaplist}>
                 <View style={styles.subList}>
                   <Text style={styles.semiboldTxt}>Due Now</Text>
-                  <Text style={styles.semiboldTxt}>${due}</Text>
+                  <Text style={styles.extraboldTxt}>${due}</Text>
                 </View>
               </View>
             </>

@@ -12,8 +12,10 @@ target 'Tabyt' do
     :hermes_enabled => false
   )
   permissions_path = '../node_modules/react-native-permissions/ios'
+  rn_maps_path = '../node_modules/react-native-maps'
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  pod 'react-native-google-maps', :path => rn_maps_path
 
   target 'TabytTests' do
     inherit! :complete

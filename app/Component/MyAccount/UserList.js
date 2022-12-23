@@ -18,6 +18,7 @@ import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import InviteModal from '../Modal/InviteModal';
 import _ from 'lodash';
+import Helper from '../../Service/Helper';
 
 const UserList = props => {
   const {showPlus, showBottom, disableLive, event, data} = props;
@@ -67,7 +68,8 @@ const UserList = props => {
                       Age: <Text style={styles.name}>{getAge(it)} </Text>|
                       Favorite Drink:{' '}
                       <Text style={styles.name}>
-                        {it.favoriteDrink.map((i, key) => i.name + ', ')}
+                        {/* {it?.favoriteDrink.map((i, key) => i.name + ', ')} */}
+                        {Helper.renderFavDrinks(it?.favoriteDrink)}
                       </Text>
                     </Text>
                   </View>

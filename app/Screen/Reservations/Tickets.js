@@ -1,20 +1,17 @@
+import ReadMore from '@fawazahmed/react-native-read-more';
+import {Icon} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import Navigation from '../../Service/Navigation';
+import SimpleToast from 'react-native-simple-toast';
 import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
-import {Icon} from 'native-base';
-import moment from 'moment';
-import SimpleToast from 'react-native-simple-toast';
-import ReadMore from '@fawazahmed/react-native-read-more';
 import Helper from '../../Service/Helper';
 
 const Tickets = props => {
@@ -113,8 +110,9 @@ const Tickets = props => {
             eventData?.timeZone,
           );
           console.log('checkStatus=>>', checkStatus);
-          if (!item.isAvailable) {
+          if (!item.isAvailable || item.purchased >= item.avl) {
             item.msg = 'Sold out!';
+            item.isAvailable = false;
           }
           if (checkStatus == 'live' && item.isAvailable) {
             item.isAvailable = true;
@@ -122,9 +120,10 @@ const Tickets = props => {
           if (checkStatus == 'not_started' && item.isAvailable) {
             item.msg = 'Sale not started yet!';
             item.isAvailable = false;
+            item.notStarted = true;
           }
           if (checkStatus == 'expired') {
-            item.msg = 'Expired';
+            // item.msg = 'Expired';
             item.isAvailable = false;
           }
           return (
@@ -189,9 +188,16 @@ const Tickets = props => {
                           maxWidth: '80%',
                         },
                       ]}>
-                      Sales End -{' '}
-                      {Helper.renderDate(item?.endDate, eventData?.timeZone)},{' '}
-                      {Helper.renderTime(item?.endTime, eventData?.timeZone)}
+                      Sales {item.notStarted ? 'Starts' : 'End'} -{' '}
+                      {Helper.renderDate(
+                        item.notStarted ? item?.startDate : item?.endDate,
+                        eventData?.timeZone,
+                      )}
+                      ,{' '}
+                      {Helper.renderTime(
+                        item.notStarted ? item?.startTime : item?.endTime,
+                        eventData?.timeZone,
+                      )}
                     </Text>
                     <Text
                       style={[
@@ -239,21 +245,29 @@ const Tickets = props => {
                   </View>
 
                   {/* <Text>{item.details}</Text> */}
-                  <ReadMore
-                    numberOfLines={2}
-                    style={{...styles.textStyle}}
-                    seeMoreStyle={{
-                      color: COLORS.theme,
-                      fontFamily: FONTS.SemiBold,
-                    }}
-                    seeLessStyle={{
-                      color: COLORS.theme,
-                      fontFamily: FONTS.SemiBold,
-                    }}>
-                    {item.details}
-                  </ReadMore>
+                  {item.details ? (
+                    <ReadMore
+                      numberOfLines={2}
+                      style={{...styles.textStyle}}
+                      seeMoreStyle={{
+                        color: COLORS.theme,
+                        fontFamily: FONTS.SemiBold,
+                      }}
+                      seeLessStyle={{
+                        color: COLORS.theme,
+                        fontFamily: FONTS.SemiBold,
+                      }}>
+                      {item.details}
+                    </ReadMore>
+                  ) : null}
                   {item?.isAvailable ? null : (
-                    <Text style={{...styles.time, color: 'red', marginLeft: 0}}>
+                    <Text
+                      style={{
+                        ...styles.time,
+                        color: 'red',
+                        marginLeft: 0,
+                        marginTop: 4,
+                      }}>
                       {item?.msg}
                     </Text>
                   )}

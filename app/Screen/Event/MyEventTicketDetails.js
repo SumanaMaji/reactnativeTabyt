@@ -6,16 +6,18 @@ import {
   Animated,
   Image,
   Modal,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import StarRating from 'react-native-star-rating';
+import EventDateTime from '../../Component/Event/EventDateTime';
+import EventName from '../../Component/Event/EventName';
+import EventOrganizedBy from '../../Component/Event/EventOrganizedBy';
+import Location from '../../Component/Event/Location';
 import BackCross from '../../Component/Header/BackCross';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
 import Loader from '../../Component/Loader';
@@ -23,7 +25,6 @@ import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale, verticalScale} from '../../PixelRatio';
 import Event from '../../Service/Event';
-import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 
 const MIN_HEIGHT = moderateScale(120);
@@ -218,130 +219,24 @@ const MyEventTicketDetails = props => {
                 paddingTop: moderateScale(10),
                 paddingBottom: moderateScale(100),
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Pressable
-                  onPress={() => Navigation.navigate('LocationView')}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '75%',
-                  }}>
-                  <Icon
-                    name="md-location-sharp"
-                    type="Ionicons"
-                    style={{color: COLORS.button, fontSize: moderateScale(18)}}
-                  />
-                  <Text
-                    style={{
-                      color: COLORS.button,
-                      fontFamily: FONTS.Medium,
-                      fontSize: moderateScale(13),
-                      width: '100%',
-                    }}
-                    numberOfLines={1}>
-                    {eventDetails.address}, {eventDetails?.cityData?.name},{' '}
-                    {eventDetails?.stateData?.name}
-                  </Text>
-                </Pressable>
-                {renderStatus()}
-              </View>
-              <Text
-                // numberOfLines={2}
-                style={{
-                  color: COLORS.white,
-                  fontFamily: FONTS.Medium,
-                  fontSize: moderateScale(15.5),
-                  lineHeight: 20,
-                  marginTop: 10,
-                }}>
-                {eventDetails.name}
-              </Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  marginTop: 3,
-                  marginBottom: 2,
-                }}>
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Regular,
-                    fontSize: moderateScale(11),
-                    opacity: 0.8,
-                  }}>
-                  Organized by:{' '}
-                  <Text style={{textDecorationLine: 'underline'}}>
-                    {eventData?.organizerData?.name}
-                  </Text>
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginLeft: 10,
-                  }}>
-                  <StarRating
-                    disabled={false}
-                    maxStars={5}
-                    rating={avgRating}
-                    starSize={10}
-                    starStyle={{color: COLORS.orange}}
-                    // selectedStar={(rating) => this.onStarRatingPress(rating)}
-                  />
-                  <Text
-                    style={{
-                      color: COLORS.white,
-                      fontFamily: FONTS.Regular,
-                      fontSize: moderateScale(10),
-                      marginLeft: 5,
-                    }}>
-                    {avgRating}
-                  </Text>
-                </View>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon
-                  style={{color: COLORS.white, fontSize: moderateScale(17)}}
-                  name="calendar"
-                  type="Ionicons"
-                />
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Medium,
-                    fontSize: moderateScale(12.5),
-                    marginLeft: 7,
-                  }}>
-                  {renderEventDateTime(eventDetails?.startDate)} to{' '}
-                  {renderEventDateTime(eventDetails?.endDate)}
-                  {/* {moment(eventDetails?.startDate).format('ll')} to{' '}
-                  {moment(eventDetails?.endDate).format('ll')} */}
-                </Text>
-              </View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon
-                  style={{color: COLORS.white, fontSize: moderateScale(17)}}
-                  name="alarm"
-                  type="Ionicons"
-                />
-                <Text
-                  style={{
-                    color: COLORS.white,
-                    fontFamily: FONTS.Medium,
-                    fontSize: moderateScale(12.5),
-                    marginLeft: 7,
-                  }}>
-                  {moment(eventDetails?.startTime).format('LT')} -{' '}
-                  {moment(eventDetails?.endTime).format('LT')}
-                </Text>
-              </View>
+              <EventName data={eventDetails} />
+              <EventOrganizedBy
+                organizerName={eventDetails?.organizerData?.name}
+                oId={eventDetails?.organizerId}
+                avgRating={avgRating}
+              />
+              <Location
+                address={eventDetails?.address}
+                cityData={eventDetails?.cityData}
+                stateData={eventDetails?.stateData}
+              />
+              <EventDateTime
+                startDate={eventDetails?.startDate}
+                endDate={eventDetails?.endDate}
+                startTime={eventDetails?.startTime}
+                endTime={eventDetails?.endTime}
+                timeZone={eventData?.timeZone}
+              />
               {eventDetails?.specialGuestsName.length > 0 ? (
                 <Text
                   style={{

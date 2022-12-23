@@ -1,17 +1,9 @@
-import {Icon} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
-} from 'react-native';
+import {Modal, ScrollView, StyleSheet, Text, View} from 'react-native';
 import SimpleToast from 'react-native-simple-toast';
 import {useSelector} from 'react-redux';
 import GradientButton from '../../Component/Button/GradientButton';
+import PaymentCard from '../../Component/Checkout/PaymentCard';
 import ReservationHeader from '../../Component/Header/BackCross';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
 import AuthModal from '../../Component/Modal/AuthModal';
@@ -22,8 +14,7 @@ import SurveyModal from '../../Component/Modal/SurveyModal';
 import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale} from '../../PixelRatio';
-import Event from '../../Service/Event';
-import EventService from '../../Service/Event';
+import {default as Event, default as EventService} from '../../Service/Event';
 import Navigation from '../../Service/Navigation';
 
 const MenuCheckout = props => {
@@ -49,6 +40,7 @@ const MenuCheckout = props => {
   const [cardData, setcardData] = useState({});
   const [disabled, setdisabled] = useState(false);
   const [cardModal, setcardModal] = useState(false);
+  const [continueBooking, setcontinueBooking] = useState(false);
 
   useEffect(() => {
     let subTotal = 0;
@@ -89,6 +81,21 @@ const MenuCheckout = props => {
     }
   }, [menuData?.category]);
 
+  useEffect(() => {
+    getPayMethod();
+  }, []);
+
+  const getPayMethod = async () => {
+    const result = await Event.getPaymentMethod();
+    console.log('getPayMethod', result.data.filter(i => i.default === true)[0]);
+    if (result && result.status) {
+      const defaultCard = result.data.filter(i => i.default === true);
+      if (defaultCard.length > 0) {
+        setcardData(defaultCard[0]);
+      }
+    }
+  };
+
   const PromoSwitch = () => {
     setIsEnabled(previousState => !previousState);
     setpromo(true);
@@ -98,20 +105,6 @@ const MenuCheckout = props => {
     setIsEnabled2(previousState => !previousState);
     setsplit(true);
   };
-
-  // const renderTotalAmt = () => {
-  //   let totalAmt;
-  //   if (eventData?.tax) {
-  //     totalAmt =
-  //       (subtotal * eventData?.tax) / 100 +
-  //       (subtotal * eventData?.tips) / 100 +
-  //       subtotal;
-  //   } else {
-  //     totalAmt = subtotal;
-  //   }
-  //   // settotal(totalAmt);
-  //   return totalAmt;
-  // };
 
   const applyPromoCode = async promoCode => {
     if (!promoCode) {
@@ -135,12 +128,24 @@ const MenuCheckout = props => {
   };
 
   const purchase = () => {
+    // if (guestLogin) {
+    //   SimpleToast.show('You need to login to view profile!');
+    //   return;
+    // } else {
+    //   // setmodal(true);
+    //   setcardModal(true);
+    // }
+
     if (guestLogin) {
       SimpleToast.show('You need to login to view profile!');
       return;
     } else {
-      // setmodal(true);
-      setcardModal(true);
+      setcontinueBooking(true);
+      if (Object.keys(cardData).length > 0) {
+        setmodal(true);
+      } else {
+        setcardModal(true);
+      }
     }
   };
 
@@ -230,6 +235,13 @@ const MenuCheckout = props => {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{paddingBottom: 70}}>
+          <PaymentCard
+            cardData={cardData}
+            newPaymentCallbBack={() => {
+              setcontinueBooking(false);
+              setcardModal(true);
+            }}
+          />
           <View style={[styles.list, {paddingVertical: moderateScale(20)}]}>
             {menuData?.category?.map((item, key) =>
               item?.catItem
@@ -436,7 +448,9 @@ const MenuCheckout = props => {
           continuePay={data => {
             setcardData(data);
             setcardModal(false);
-            setmodal(true);
+            if (continueBooking) {
+              setmodal(true);
+            }
           }}
         />
       </Modal>

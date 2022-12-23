@@ -75,12 +75,12 @@ const LIST = [
     type: 'Ionicons',
     path: 'Reviews',
   },
-  {
-    name: 'Get Help',
-    icon: 'wallet',
-    type: 'Ionicons',
-    path: 'Help',
-  },
+  // {
+  //   name: 'Get Help',
+  //   icon: 'wallet',
+  //   type: 'Ionicons',
+  //   path: 'Help',
+  // },
 ];
 
 const MyEventAbout = props => {

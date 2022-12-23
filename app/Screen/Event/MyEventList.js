@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import BackCross from '../../Component/Header/BackCross';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
+import Loader from '../../Component/Loader';
 import HomeSearch from '../../Component/Search/HomeSearch';
 import TicketsList from '../../Component/Tickets/TicketsList';
 import {COLORS} from '../../Constant/Colors';
@@ -18,6 +19,7 @@ const MyEventList = () => {
   const [allEvent, setallEvent] = useState([]);
   const [completeEvent, setcompleteEvent] = useState([]);
   const [canceledEvent, setcanceledEvent] = useState([]);
+  const [isFetching, setisFetching] = useState(true);
 
   useEffect(() => {
     getMYEvent();
@@ -40,6 +42,7 @@ const MyEventList = () => {
       );
       setcanceledEvent(result.data.filter(it => it.bookingStatus == 'cancel'));
     }
+    setisFetching(false);
   };
 
   return (
@@ -91,8 +94,9 @@ const MyEventList = () => {
             </Text>
           </Pressable>
         </View>
-
-        {active == 0 ? (
+        {isFetching ? (
+          <Loader />
+        ) : active == 0 ? (
           <TicketsList click={true} live={true} cancel={true} data={allEvent} />
         ) : null}
         {active == 1 ? (

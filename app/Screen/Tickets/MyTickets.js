@@ -1,16 +1,16 @@
+import {useIsFocused} from '@react-navigation/native';
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import HomeHeader from '../../Component/Header/HomeHeader';
 import CustomImageBackground from '../../Component/ImageBackground/CustomImageBackground';
+import Loader from '../../Component/Loader';
 import HomeSearch from '../../Component/Search/HomeSearch';
+import TicketsList from '../../Component/Tickets/TicketsList';
 import {COLORS} from '../../Constant/Colors';
 import {FONTS} from '../../Constant/Font';
 import {moderateScale} from '../../PixelRatio';
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import TicketsList from '../../Component/Tickets/TicketsList';
 import Event from '../../Service/Event';
-import {useIsFocused} from '@react-navigation/native';
-import moment from 'moment';
 
 const MyTickets = () => {
   const isFocused = useIsFocused();
@@ -19,12 +19,14 @@ const MyTickets = () => {
   const [allLiveEvent, setallLiveEvent] = useState([]);
   const [pendingEvent, setpendingEvent] = useState([]);
   const [refresh, setrefresh] = useState(false);
+  const [isFetching, setisFetching] = useState(true);
 
   useEffect(() => {
     getMYEvent();
   }, [isFocused]);
 
   const getMYEvent = async () => {
+    setisFetching(true);
     setallEvent([]);
     setallLiveEvent([]);
     setpendingEvent([]);
@@ -71,6 +73,7 @@ const MyTickets = () => {
       setrefresh(!refresh);
       // console.log('allEventallEventallEventallEvent=>>', allEvent);
     }
+    setisFetching(false);
   };
 
   // useEffect(() => {
@@ -138,30 +141,36 @@ const MyTickets = () => {
           </Pressable>
         </View>
 
-        {active == 0 ? (
-          <TicketsList
-            click={true}
-            live={true}
-            ticket={true}
-            data={[...allEvent.filter(i => i.showAll == true)]}
-          />
-        ) : null}
-        {active == 1 ? (
-          <TicketsList
-            click={true}
-            live={true}
-            ticket={true}
-            data={allLiveEvent}
-          />
-        ) : null}
-        {active == 2 ? (
-          <TicketsList
-            click={true}
-            live={false}
-            ticket={true}
-            data={pendingEvent}
-          />
-        ) : null}
+        {isFetching ? (
+          <Loader />
+        ) : (
+          <>
+            {active == 0 ? (
+              <TicketsList
+                click={true}
+                live={true}
+                ticket={true}
+                data={[...allEvent.filter(i => i.showAll == true)]}
+              />
+            ) : null}
+            {active == 1 ? (
+              <TicketsList
+                click={true}
+                live={true}
+                ticket={true}
+                data={allLiveEvent}
+              />
+            ) : null}
+            {active == 2 ? (
+              <TicketsList
+                click={true}
+                live={false}
+                ticket={true}
+                data={pendingEvent}
+              />
+            ) : null}
+          </>
+        )}
       </View>
 
       {/* <TicketsList /> */}

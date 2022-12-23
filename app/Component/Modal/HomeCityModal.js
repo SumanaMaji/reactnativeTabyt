@@ -50,7 +50,7 @@ const HomeCityModal = props => {
   };
 
   return (
-    <Modal visible={visible}>
+    <Modal visible={visible} animationType="slide">
       <CustomImageBackground>
         <SafeAreaView style={{flex: 1}}>
           <View
