@@ -16,3 +16,5 @@ const provider = () => {
   );
 };
 AppRegistry.registerComponent(appName, () => provider);
+//AppRegistry.registerHeadlessTask('RNFirebaseBackgroundMessage', () => firebaseBackgroundMessage);
+

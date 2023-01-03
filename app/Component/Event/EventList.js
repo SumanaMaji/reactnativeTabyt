@@ -13,7 +13,7 @@ import momentTimezone from 'moment-timezone';
 
 export default function EventList(props) {
   const {item} = props;
-  console.log('item=>>', item.name);
+  //console.log('item=>>', item.name);
   const renderStatus = () => {
     // console.log('render time', new Date('2022-12-16T02:00:24.834Z').get);
     // console.log(

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "596169477965",
+    "project_id": "tabyt-45d8b",
+    "storage_bucket": "tabyt-45d8b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596169477965:android:d86fa94ba18db405baf104",
+        "android_client_info": {
+          "package_name": "com.tabyt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596169477965-7u2bfqke24atqrtak113jog7qltcpo18.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3FmxxoCFcTlFSLgFE3LTimhUqYyUFoP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596169477965-7u2bfqke24atqrtak113jog7qltcpo18.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

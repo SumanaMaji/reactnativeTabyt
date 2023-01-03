@@ -18,6 +18,7 @@ import Chat from '../../Service/Chat';
 import Navigation from '../../Service/Navigation';
 import {BASE_DOMAIN} from '../../Utils/HttpClient';
 import {useIsFocused} from '@react-navigation/native';
+import {notificationListener} from "../../Utils/notificationService";
 
 const ChatList = props => {
   const isFocused = useIsFocused();
@@ -42,6 +43,15 @@ const ChatList = props => {
     console.log('chat list=>>', JSON.stringify(result));
     if (result && result.status) {
       setallChatList(result.data);
+      //console.log("unread-----"+result.data.isseen);
+    //   result.data.map((messageData) => {
+    //     console.log("unread-----"+ JSON.stringify(messageData.isSeen));
+    //     if(messageData.isSeen == false)
+    //     {
+    //       notificationListener();
+    //     }
+    // });
+      
     }
   };
 

@@ -7,8 +7,10 @@ import {COLORS} from './app/Constant/Colors';
 import AppStack from './app/Navigation/AppStack';
 import {useDispatch, useSelector} from 'react-redux';
 import Auth from './app/Service/Auth';
+import Chat from './app/Service/Chat';
 import {setUser} from './app/Redux/reducer/user';
 import Loading from './app/Screen/Auth/Loading';
+import {requestUserPermission, notificationListener} from "./app/Utils/notificationService";
 
 const Stack = createStackNavigator();
 
@@ -29,13 +31,30 @@ export default function App() {
         setcheck(false);
       }
     }
+    async function getChatListData() {
+      const result = await Chat.getChatList();
+      console.log('chat list check =>>', JSON.stringify(result));
+      if (result && result.status) {
+        result.data.map((messageData) => {
+          console.log("unread-----"+ JSON.stringify(messageData.isSeen));
+          if(messageData.isSeen == false)
+          {
+            requestUserPermission(messageData.message);
+            notificationListener();
+          }
+      });    
+      }
+    }
     fetchData();
+    //requestUserPermission();
+    getChatListData();
     return () => null;
   }, []);
 
   if (check) {
     return <Loading />;
   }
+ 
   return (
     <NavigationContainer ref={r => Navigation.setTopLevelNavigator(r)}>
       <Stack.Navigator
