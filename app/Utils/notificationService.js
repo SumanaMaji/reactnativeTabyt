@@ -3,7 +3,7 @@ import messaging from '@react-native-firebase/messaging';
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, StyleSheet, Button, Alert } from "react-native";
 import Navigation from '../../app/Service/Navigation';
-export async function requestUserPermission(message) {
+export async function requestUserPermission(username, type) {
 //console.log("user id -->"+userId);
 // Initialize Firebase
 var config = {
@@ -23,10 +23,10 @@ var config = {
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
   if (enabled) {
     console.log('Authorization status:', authStatus);
-    getFcmToken(message);
+    getFcmToken(username, type);
   }
 }
-const getFcmToken = async (message) => {
+const getFcmToken = async (username, type) => {
   
   let fcmToken = null
   try{
@@ -38,14 +38,28 @@ const getFcmToken = async (message) => {
   console.log(`FCM Token Generate: ${fcmToken}`)
   if (fcmToken) {
    // console.log(fcmToken, "-->new version")
-     let dataToSend={
+   if(type == 'message')
+   {
+     var dataToSend={
        to: fcmToken,
         notification: {
-          body: message,
+          body: username + " sent you a message",
           title: "Tabyt",
           subtitle: "Messages"
         }
      };
+    }
+     else
+     {
+      var dataToSend={
+        to: fcmToken,
+         notification: {
+           body: username + " would like to follow you",
+           title: "Tabyt",
+           subtitle: "Follow"
+         }
+      };
+    }
      console.log(dataToSend);
    console.log(`New FCM Token: ${fcmToken}`)
      let userToken = 'AAAAis54T00:APA91bGWPgwbZs0TzIHBlcUP9yLii2uYxUQ3W8NxkLm2H8KzjOsFZjolF18SuEc2TVtCHtJWQX2OZilMf5rOPa8gwmWB5cVAwpu1588iUlwpWPyVkq5T3wgUyuyEXPV3HshPPypczCoE';
@@ -72,21 +86,36 @@ const getFcmToken = async (message) => {
    }
 }
 
-export const notificationListener = async () => {
+export const notificationListener = async (type) => {
   // Assume a message-notification contains a "type" property in the data payload of the screen to open
   messaging().onNotificationOpenedApp(remoteMessage => {
     console.log("recevied in background App", remoteMessage)
-    Navigation.navigate('ChatList');
+    if(type == 'message'){
+      Navigation.navigate('ChatList');
+    }
+    else{
+      Navigation.navigate('MyActivities')
+    }
   });
   messaging().onMessage(async remoteMessage => {
    console.log("recevied in foreground", remoteMessage);
-   Navigation.navigate('ChatList');
+   if(type == 'message'){
+    Navigation.navigate('ChatList');
+  }
+  else{
+    Navigation.navigate('MyActivities')
+  }
   });
   // Register background handler
 //messaging().setBackgroundMessageHandler(async (remoteMessage,navigation) => {
   messaging().setBackgroundMessageHandler(async remoteMessage => {
  console.log("background ---"+JSON.stringify(remoteMessage));
- Navigation.navigate('ChatList');
+    if(type == 'message'){
+      Navigation.navigate('ChatList');
+    }
+    else{
+      Navigation.navigate('MyActivities')
+    }
 });
   // Check whether an initial notification is available
   messaging()
