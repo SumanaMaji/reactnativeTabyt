@@ -5,8 +5,9 @@ import { View, StyleSheet, Button, Alert, Platform } from "react-native";
 import Navigation from '../../app/Service/Navigation';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import PushNotification from "react-native-push-notification";
+import Auth from '../Service/Auth';
 
-export async function requestUserPermission(username, type) {
+export async function requestUserPermission(username, type, id) {
 //console.log("user id -->"+userId);
 // Initialize Firebase
 // var config = {
@@ -26,7 +27,7 @@ export async function requestUserPermission(username, type) {
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
   if (enabled) {
     console.log('Authorization status:', authStatus);
-    getFcmToken(username, type);
+    getFcmToken(username, type, id);
   }
 }
 //PushNotification.setApplicationIconBadgeNumber(3)
@@ -50,7 +51,7 @@ Platform.OS == 'ios' ?
   }
 }));
 
-const getFcmToken = async (username, type) => {
+const getFcmToken = async (username, type, id) => {
   
   let fcmToken = null
   try{
@@ -60,6 +61,20 @@ const getFcmToken = async (username, type) => {
     console.log(`Error in FCM: ${error}`)
   }
   console.log(`FCM Token Generate: ${fcmToken}`)
+
+  // let data = {
+  //   fcmToken: fcmToken,
+  //   _id: id
+  // };
+  // let result = await Auth.updateprofile(data);
+  // console.log('update', result);
+  // if (result && result.status) {
+  //   console.log('fcmToken insert-->'+result)
+  //  // Toast.show('Update Successfully!', Toast.SHORT);
+  //   await Auth.setAccount(result.data);
+  //   dispatch(setUser(result.data));
+  // }
+
   if (fcmToken) {
    // console.log(fcmToken, "-->new version")
    if(type == 'message')
@@ -180,6 +195,7 @@ export const notificationListener = async (type) => {
 //messaging().setBackgroundMessageHandler(async (remoteMessage,navigation) => {
   messaging()
   .setBackgroundMessageHandler(async remoteMessage => {
+    Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
  console.log("background ---"+JSON.stringify(remoteMessage));
     if(type == 'message'){
       Navigation.navigate('ChatList');

@@ -3,6 +3,9 @@ import AuthService from '@Service/Auth';
 
 const BASE_URL = 'http://13.58.94.24:8000/api/v1/';
 export const BASE_DOMAIN = 'http://13.58.94.24:8000/';
+// const BASE_URL = 'http://127.0.0.1:8090/api/v1/';//'http://13.58.94.24:8000/api/v1/';
+// export const BASE_DOMAIN = 'http://127.0.0.1:8090/';//'http://13.58.94.24:8000/';
+
 
 function get(endpoint, params) {
   return request(endpoint, params);
